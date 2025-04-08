@@ -87,7 +87,7 @@ def generate_resume_pdf(data, font_size, font_color, background_color):
     pdf.set_margins(10, 10, 10)
     pdf.font_color = hex_to_rgb(font_color)
     pdf.bg_color = hex_to_rgb(background_color)
-    pdf.font_size_custom = font_size  # 🩵 Apply custom font size
+    pdf.font_size_custom = font_size  
 
     pdf.name = data.get('name', '')
     pdf.email = data.get('email', '')
