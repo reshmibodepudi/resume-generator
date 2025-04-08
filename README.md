@@ -27,7 +27,7 @@ A command-line Python script that helps you generate a customizable PDF resume. 
 ##  Installation
 
 ```bash
-pip install fpdf2 requests
+pip install fpdf2 requests```
 
 
 ---
