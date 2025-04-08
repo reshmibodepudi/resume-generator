@@ -52,4 +52,4 @@ python generate_resume.py --font-size 12 --font-color "#000000" --background-col
 ##  Installation
 
 ```bash
-pip install fpdf2 requests
+pip install fpdf requests
