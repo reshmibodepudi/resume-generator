@@ -27,16 +27,6 @@ A command-line Python script that helps you generate a customizable PDF resume. 
 ##  Installation
 
 ```bash
-pip install fpdf2 requests```
-
-
----
-
-##  Usage
-
-###  Basic Command
-
-```bash
-python generate_resume.py --font-size 12 --font-color "#000000" --background-color "#FFFFFF"
+pip install fpdf2 requests
 
 
