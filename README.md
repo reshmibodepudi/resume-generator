@@ -39,7 +39,7 @@ cd resume-generator
 2. **Install dependencies**
 
 ```bash
-pip install fpdf2 requests
+pip install fpdf requests
 ```
 3. **Run the script**
 
