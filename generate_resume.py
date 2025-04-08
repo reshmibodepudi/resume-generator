@@ -2,7 +2,7 @@ from fpdf import FPDF
 import argparse
 import requests
 
-class StylishResume(FPDF):
+class ResumeGenerator(FPDF):
     def header(self):
         self.set_fill_color(*self.bg_color)
         self.rect(0, 0, 210, 297, 'F')
@@ -13,12 +13,12 @@ class StylishResume(FPDF):
         self.set_font('Helvetica', '', 10)
         self.set_text_color(80, 80, 80)
 
-        # Clean line 1
+        
         line_1_parts = [self.email, self.phone]
         contact_line_1 = " | ".join(part for part in line_1_parts if part)
         self.cell(0, 7, contact_line_1, ln=True, align='C')
 
-        # Clean line 2
+        
         line_2_parts = [self.address, self.twitter, self.linkedin, self.github]
         contact_line_2 = " | ".join(part for part in line_2_parts if part)
         self.multi_cell(0, 5, contact_line_2, align='C')
@@ -50,7 +50,7 @@ class StylishResume(FPDF):
                 if title:
                     self.set_font('Arial', 'B', 11)
                     if section == "PROJECTS" and duration:
-                        # Left title, right-aligned date on the same line
+                       
                         x_before = self.get_x()
                         y_before = self.get_y()
                         self.cell(140, 8, title, ln=0)
@@ -87,8 +87,8 @@ def hex_to_rgb(hex_color):
     hex_color = hex_color.lstrip('#')
     return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
 
-def generate_stylish_pdf(data, font_size, font_color, background_color):
-    pdf = StylishResume()
+def generate_resume_pdf(data, font_size, font_color, background_color):
+    pdf = ResumeGenerator()
     pdf.set_margins(10, 10, 10)
     pdf.font_color = hex_to_rgb(font_color)
     pdf.bg_color = hex_to_rgb(background_color)
@@ -170,7 +170,7 @@ def fetch_resume_data_from_api(name):
         return None
 
 def main():
-    parser = argparse.ArgumentParser(description="Stylish Resume PDF Generator")
+    parser = argparse.ArgumentParser(description="Resume PDF Generator")
     parser.add_argument('--font-size', type=int, default=12)
     parser.add_argument('--font-color', type=str, default='#000000')
     parser.add_argument('--background-color', type=str, default='#FFFFFF')
@@ -186,18 +186,14 @@ def main():
             print("\n--- Resume data fetched from API ---")
             for key, value in data.items():
                 print(f"{key.capitalize()}: {value}")
-            edit = input("\nDo you want to edit this information? (y/n): ").strip().lower()
-            if edit == 'y':
-                resume_data = collect_resume_data()
-            else:
-                resume_data = data
+            resume_data = data
         else:
             print("Switching to manual entry...")
             resume_data = collect_resume_data()
     else:
         resume_data = collect_resume_data()
 
-    generate_stylish_pdf(resume_data, args.font_size, args.font_color, args.background_color)
+    generate_resume_pdf(resume_data, args.font_size, args.font_color, args.background_color)
 
 if __name__ == '__main__':
     main()
