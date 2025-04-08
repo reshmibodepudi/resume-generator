@@ -6,24 +6,22 @@ class ResumeGenerator(FPDF):
     def header(self):
         self.set_fill_color(*self.bg_color)
         self.rect(0, 0, 210, 297, 'F')
-        self.set_font('Arial', 'B', 13)
+        self.set_font('Arial', 'B', 20)
         self.set_text_color(*self.font_color)
         self.cell(0, 10, self.name, ln=True, align='C')
 
-        self.set_font('Helvetica', '', 10)
-        self.set_text_color(80, 80, 80)
+        self.set_font('Arial', '', 11)
+        self.set_text_color(50, 50, 50)
 
-        
         line_1_parts = [self.email, self.phone]
         contact_line_1 = " | ".join(part for part in line_1_parts if part)
-        self.cell(0, 7, contact_line_1, ln=True, align='C')
+        self.cell(0, 6, contact_line_1, ln=True, align='C')
 
-        
         line_2_parts = [self.address, self.twitter, self.linkedin, self.github]
         contact_line_2 = " | ".join(part for part in line_2_parts if part)
-        self.multi_cell(0, 5, contact_line_2, align='C')
+        self.multi_cell(0, 4, contact_line_2, align='C')
 
-        self.ln(5)
+        self.ln(3)
 
 
     def section_title(self, title):
