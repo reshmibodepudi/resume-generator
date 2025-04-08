@@ -10,7 +10,7 @@ class ResumeGenerator(FPDF):
         self.set_text_color(*self.font_color)
         self.cell(0, 10, self.name, ln=True, align='C')
 
-        self.set_font('Arial', '', 11)
+        self.set_font('Arial', '', self.font_size_custom)
         self.set_text_color(50, 50, 50)
 
         line_1_parts = [self.email, self.phone]
@@ -20,9 +20,7 @@ class ResumeGenerator(FPDF):
         line_2_parts = [self.address, self.twitter, self.linkedin, self.github]
         contact_line_2 = " | ".join(part for part in line_2_parts if part)
         self.multi_cell(0, 4, contact_line_2, align='C')
-
         self.ln(3)
-
 
     def section_title(self, title):
         self.set_draw_color(0, 102, 204)
@@ -35,24 +33,23 @@ class ResumeGenerator(FPDF):
         self.ln(2)
 
     def section_body(self, items, bullet_points=True, section=""):
-        self.set_font('Arial', '', 11)
+        self.set_font('Arial', '', self.font_size_custom)
         self.set_text_color(*self.font_color)
-        
+
         for item in items:
             if isinstance(item, dict):
                 title = item.get('title', '')
                 start = item.get('startDate', '')
                 end = item.get('endDate', '')
                 duration = f"{start} to {end}" if start and end else ''
-                
+
                 if title:
-                    self.set_font('Arial', 'B', 11)
+                    self.set_font('Arial', 'B', self.font_size_custom)
                     if section == "PROJECTS" and duration:
-                       
                         x_before = self.get_x()
                         y_before = self.get_y()
                         self.cell(140, 8, title, ln=0)
-                        self.set_font('Arial', '', 10)
+                        self.set_font('Arial', '', self.font_size_custom - 1)
                         self.cell(0, 8, duration, ln=1, align='R')
                         self.set_y(y_before + 8)
                     else:
@@ -60,7 +57,7 @@ class ResumeGenerator(FPDF):
 
                 for k, v in item.items():
                     if k.lower() not in ['title', 'startdate', 'enddate']:
-                        self.set_font('Arial', '', 11)
+                        self.set_font('Arial', '', self.font_size_custom)
                         self.multi_cell(0, 6, str(v))
                 self.ln(3)
             else:
@@ -73,7 +70,7 @@ class ResumeGenerator(FPDF):
         self.ln(4)
 
     def section_list_inline(self, items):
-        self.set_font('Arial', '', 11)
+        self.set_font('Arial', '', self.font_size_custom)
         self.set_text_color(*self.font_color)
         for item in items:
             safe_item = str(item).replace('•', '-').encode('latin-1', 'replace').decode('latin-1')
@@ -90,6 +87,7 @@ def generate_resume_pdf(data, font_size, font_color, background_color):
     pdf.set_margins(10, 10, 10)
     pdf.font_color = hex_to_rgb(font_color)
     pdf.bg_color = hex_to_rgb(background_color)
+    pdf.font_size_custom = font_size  # 🩵 Apply custom font size
 
     pdf.name = data.get('name', '')
     pdf.email = data.get('email', '')
@@ -105,25 +103,21 @@ def generate_resume_pdf(data, font_size, font_color, background_color):
         pdf.section_title("SUMMARY")
         pdf.section_body([data['summary']], bullet_points=False)
 
-    if data.get('education'):
-        if any(data['education']):
-            pdf.section_title("EDUCATION")
-            pdf.section_body(data['education'])
+    if data.get('education') and any(data['education']):
+        pdf.section_title("EDUCATION")
+        pdf.section_body(data['education'])
 
-    if data.get('experience'):
-        if any(data['experience']):
-            pdf.section_title("PROFESSIONAL EXPERIENCE")
-            pdf.section_body(data['experience'])
+    if data.get('experience') and any(data['experience']):
+        pdf.section_title("PROFESSIONAL EXPERIENCE")
+        pdf.section_body(data['experience'])
 
-    if any(data['skills']):
+    if data.get('skills') and any(data['skills']):
         pdf.section_title("TECHNICAL SKILLS")
         pdf.section_list_inline(data['skills'])
 
-    if data.get('projects'):
-        if any(data['projects']):
-            pdf.section_title("PROJECTS")
-            pdf.section_body(data['projects'], section="PROJECTS")
-
+    if data.get('projects') and any(data['projects']):
+        pdf.section_title("PROJECTS")
+        pdf.section_body(data['projects'], section="PROJECTS")
 
     pdf.output("generated_resume_output.pdf")
     print("\n✨  Resume saved as 'generated_resume_output.pdf'")
