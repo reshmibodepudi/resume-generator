@@ -9,13 +9,22 @@ class StylishResume(FPDF):
         self.set_font('Arial', 'B', 13)
         self.set_text_color(*self.font_color)
         self.cell(0, 10, self.name, ln=True, align='C')
+
         self.set_font('Helvetica', '', 10)
         self.set_text_color(80, 80, 80)
-        contact_line_1 = f"{self.email} | {self.phone}"
-        contact_line_2 = f"{self.address} | {self.twitter} | {self.linkedin} | {self.github}"
+
+        # Clean line 1
+        line_1_parts = [self.email, self.phone]
+        contact_line_1 = " | ".join(part for part in line_1_parts if part)
         self.cell(0, 7, contact_line_1, ln=True, align='C')
+
+        # Clean line 2
+        line_2_parts = [self.address, self.twitter, self.linkedin, self.github]
+        contact_line_2 = " | ".join(part for part in line_2_parts if part)
         self.multi_cell(0, 5, contact_line_2, align='C')
+
         self.ln(5)
+
 
     def section_title(self, title):
         self.set_draw_color(0, 102, 204)
@@ -27,23 +36,39 @@ class StylishResume(FPDF):
         self.cell(0, 10, title, ln=True)
         self.ln(2)
 
-    def section_body(self, items, bullet_points=True):
+    def section_body(self, items, bullet_points=True, section=""):
         self.set_font('Arial', '', 11)
         self.set_text_color(*self.font_color)
+        
         for item in items:
             if isinstance(item, dict):
-                for k, v in item.items():
-                    if k.lower() in ['title', 'company', 'position']:
-                        self.set_font('Arial', 'B', 11)
-                        self.cell(0, 8, str(v), ln=True)
+                title = item.get('title', '')
+                start = item.get('startDate', '')
+                end = item.get('endDate', '')
+                duration = f"{start} to {end}" if start and end else ''
+                
+                if title:
+                    self.set_font('Arial', 'B', 11)
+                    if section == "PROJECTS" and duration:
+                        # Left title, right-aligned date on the same line
+                        x_before = self.get_x()
+                        y_before = self.get_y()
+                        self.cell(140, 8, title, ln=0)
+                        self.set_font('Arial', '', 10)
+                        self.cell(0, 8, duration, ln=1, align='R')
+                        self.set_y(y_before + 8)
                     else:
+                        self.cell(0, 8, title, ln=True)
+
+                for k, v in item.items():
+                    if k.lower() not in ['title', 'startdate', 'enddate']:
                         self.set_font('Arial', '', 11)
                         self.multi_cell(0, 6, str(v))
                 self.ln(3)
             else:
                 safe_item = str(item).replace('•', '-').encode('latin-1', 'replace').decode('latin-1')
                 if bullet_points:
-                    self.cell(10, 6, chr(149), ln=0) 
+                    self.cell(10, 6, chr(149), ln=0)
                 else:
                     self.cell(10, 6, '', ln=0)
                 self.multi_cell(0, 6, safe_item)
@@ -92,15 +117,15 @@ def generate_stylish_pdf(data, font_size, font_color, background_color):
             pdf.section_title("PROFESSIONAL EXPERIENCE")
             pdf.section_body(data['experience'])
 
+    if any(data['skills']):
+        pdf.section_title("TECHNICAL SKILLS")
+        pdf.section_list_inline(data['skills'])
+
     if data.get('projects'):
         if any(data['projects']):
             pdf.section_title("PROJECTS")
-            pdf.section_body(data['projects'])
+            pdf.section_body(data['projects'], section="PROJECTS")
 
-    if data.get('skills'):
-        if any(data['skills']):
-            pdf.section_title("TECHNICAL SKILLS")
-            pdf.section_list_inline(data['skills'])
 
     pdf.output("generated_resume_output.pdf")
     print("\n✨  Resume saved as 'generated_resume_output.pdf'")
